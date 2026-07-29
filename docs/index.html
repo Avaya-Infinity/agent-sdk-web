@@ -1,0 +1,180 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@avaya/infinity-agent-sdk - v0.0.0-test1</title><meta name="description" content="Documentation for @avaya/infinity-agent-sdk"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script><script async src="assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">@avaya/infinity-agent-sdk - v0.0.0-test1</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>@avaya/infinity-agent-sdk - v0.0.0-test1</h1></div><div class="tsd-panel tsd-typography"><h1 id="agent-sdk" class="tsd-anchor-link">Agent SDK<a href="#agent-sdk" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<h2 id="overview" class="tsd-anchor-link">Overview<a href="#overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The Avaya Infinity Agent SDK provides functionality for contact center agents to authenticate, manage their status, handle queues, and process customer interactions on the Avaya Infinity™ platform.</p>
+<h2 id="installation" class="tsd-anchor-link">Installation<a href="#installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<blockquote>
+<p><strong>Note</strong>: This package is not yet published to npm. For local development, use the monorepo workspace setup described in the <a href="media/README.md">root README</a>.</p>
+</blockquote>
+<p>To install the Agent SDK (once published), run the following command:</p>
+<pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-3">--save</span><span class="hl-1"> </span><span class="hl-2">@avaya/infinity-agent-sdk</span>
+</code><button type="button">Copy</button></pre>
+
+<p>The SDK exports a set of types and classes. The class <code>AvayaInfinityAgentSdk</code> is the entry point for SDK initialization. It can be imported as follows:</p>
+<pre><code class="typescript"><span class="hl-4">import</span><span class="hl-1"> { </span><span class="hl-5">AvayaInfinityAgentSdk</span><span class="hl-1"> } </span><span class="hl-4">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@avaya/infinity-agent-sdk&quot;</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="usage" class="tsd-anchor-link">Usage<a href="#usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="initialization" class="tsd-anchor-link">Initialization<a href="#initialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Before any operation can be performed, the SDK must be initialized. The initialization process handles OAuth authentication, establishes WebSocket connections, and returns a <code>User</code> object representing the authenticated agent.</p>
+<p>The SDK supports two OAuth authentication modes via the <code>oAuthMode</code> parameter:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+<th><code>init()</code> calls</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>redirect</code> (default)</td>
+<td>Navigates the page to the IdP login page</td>
+<td>Two (before and after redirect)</td>
+<td>Standalone SPAs</td>
+</tr>
+<tr>
+<td><code>popup</code></td>
+<td>Opens the IdP login in a popup window</td>
+<td>One</td>
+<td>Iframe-embedded apps (e.g., Salesforce)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="redirect-mode-default" class="tsd-anchor-link">Redirect mode (default)<a href="#redirect-mode-default" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<p>In redirect mode, calling <code>init()</code> navigates the browser to the IdP login page. After the user authenticates, the IdP redirects back to <code>oAuthRedirectUri</code> with an authorization code. The application must call <code>init()</code> again on the redirect landing page to complete the flow.</p>
+<pre><code class="typescript"><span class="hl-4">import</span><span class="hl-1"> { </span><span class="hl-5">AvayaInfinityAgentSdk</span><span class="hl-1"> } </span><span class="hl-4">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@avaya/infinity-agent-sdk&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">user</span><span class="hl-1"> = </span><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">init</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-5">avayaInfinityHost:</span><span class="hl-1"> </span><span class="hl-2">&quot;api.avayacloud.com&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">clientId:</span><span class="hl-1"> </span><span class="hl-2">&quot;your-client-id&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">oAuthRedirectUri:</span><span class="hl-1"> </span><span class="hl-5">window</span><span class="hl-1">.</span><span class="hl-5">location</span><span class="hl-1">.</span><span class="hl-5">origin</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<blockquote>
+<p><strong>Note</strong>: In redirect mode, the first <code>init()</code> call triggers a page redirect and returns a never-resolving promise. Ensure your application calls <code>init()</code> on every page load so it can complete the flow after the IdP redirects back.</p>
+</blockquote>
+<h4 id="popup-mode" class="tsd-anchor-link">Popup mode<a href="#popup-mode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<p>In popup mode, <code>init()</code> opens the IdP login page in a popup window. The current page is never navigated away, and the returned promise resolves with the <code>User</code> once authentication completes in the popup. This mode requires a callback page (see <a href="#oauth-callback-page">OAuth Callback Page</a>) hosted at the <code>oAuthRedirectUri</code>.</p>
+<pre><code class="typescript"><span class="hl-4">import</span><span class="hl-1"> { </span><span class="hl-5">AvayaInfinityAgentSdk</span><span class="hl-1"> } </span><span class="hl-4">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@avaya/infinity-agent-sdk&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-7">// Must be called inside a user click handler to avoid browser popup blockers</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">user</span><span class="hl-1"> = </span><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">init</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-5">avayaInfinityHost:</span><span class="hl-1"> </span><span class="hl-2">&quot;api.avayacloud.com&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">clientId:</span><span class="hl-1"> </span><span class="hl-2">&quot;your-client-id&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">oAuthRedirectUri:</span><span class="hl-1"> </span><span class="hl-2">&quot;https://your-app.com/callback.html&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">oAuthMode:</span><span class="hl-1"> </span><span class="hl-2">&quot;popup&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<blockquote>
+<p><strong>Important</strong>: Browsers block popups that are not opened from a direct user gesture (e.g., a button click). Ensure <code>init()</code> is called synchronously within a click event handler.</p>
+</blockquote>
+<h3 id="oauth-callback-page" class="tsd-anchor-link">OAuth Callback Page<a href="#oauth-callback-page" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>When using popup mode, the IdP redirects the popup window to the <code>oAuthRedirectUri</code> after authentication. A callback page must be hosted at that URI to send the authorization code back to the SDK.</p>
+<h4 id="using-the-sdk-provided-callback-page" class="tsd-anchor-link">Using the SDK-provided callback page<a href="#using-the-sdk-provided-callback-page" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<p>The SDK ships a <code>callback.html</code> file that you can copy and host at your redirect URI. It handles extracting the authorization code from the URL and posting it back to the opener window automatically.</p>
+<h4 id="using-a-custom-callback-page" class="tsd-anchor-link">Using a custom callback page<a href="#using-a-custom-callback-page" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<p>If you need a custom callback page, the SDK exports a <code>handleOAuthCallback()</code> helper function:</p>
+<pre><code class="typescript"><span class="hl-7">// In your custom callback page (e.g., my-callback.ts)</span><br/><span class="hl-4">import</span><span class="hl-1"> { </span><span class="hl-5">handleOAuthCallback</span><span class="hl-1"> } </span><span class="hl-4">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@avaya/infinity-agent-sdk&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-0">handleOAuthCallback</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<p>This function extracts the <code>code</code> and <code>error</code> query parameters from the URL, sends them to the opener window via <code>postMessage</code>, and closes the popup.</p>
+<h3 id="managing-agent-status" class="tsd-anchor-link">Managing Agent Status<a href="#managing-agent-status" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Agents can change their availability status using reason codes:</p>
+<pre><code class="typescript"><span class="hl-7">// Get available reason codes</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">reasons</span><span class="hl-1"> = </span><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">user</span><span class="hl-1">.</span><span class="hl-0">getAssignableReasonCodes</span><span class="hl-1">();</span><br/><br/><span class="hl-7">// Change status to a specific reason</span><br/><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">user</span><span class="hl-1">.</span><span class="hl-0">changeStatus</span><span class="hl-1">(</span><span class="hl-5">reasons</span><span class="hl-1">[</span><span class="hl-8">0</span><span class="hl-1">]);</span><br/><br/><span class="hl-7">// Get current status</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">currentStatus</span><span class="hl-1"> = </span><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">user</span><span class="hl-1">.</span><span class="hl-0">refreshStatus</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="working-with-queues" class="tsd-anchor-link">Working with Queues<a href="#working-with-queues" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Agents can login/logout from queues to receive interactions:</p>
+<pre><code class="typescript"><span class="hl-7">// Get assigned queues</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">queues</span><span class="hl-1"> = </span><span class="hl-5">user</span><span class="hl-1">.</span><span class="hl-0">getAssignedQueues</span><span class="hl-1">();</span><br/><br/><span class="hl-7">// Login to a queue</span><br/><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">queues</span><span class="hl-1">[</span><span class="hl-8">0</span><span class="hl-1">].</span><span class="hl-0">login</span><span class="hl-1">();</span><br/><br/><span class="hl-7">// Logout from a queue with a reason</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">reasons</span><span class="hl-1"> = </span><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">user</span><span class="hl-1">.</span><span class="hl-0">getAssignableReasonCodes</span><span class="hl-1">();</span><br/><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">queues</span><span class="hl-1">[</span><span class="hl-8">0</span><span class="hl-1">].</span><span class="hl-0">logout</span><span class="hl-1">(</span><span class="hl-5">reasons</span><span class="hl-1">[</span><span class="hl-8">0</span><span class="hl-1">]);</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="handling-interactions" class="tsd-anchor-link">Handling Interactions<a href="#handling-interactions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Subscribe to receive new interactions and manage their lifecycle:</p>
+<pre><code class="typescript"><span class="hl-7">// Subscribe to new interactions</span><br/><span class="hl-5">user</span><span class="hl-1">.</span><span class="hl-0">subscribe</span><span class="hl-1">(</span><span class="hl-2">&quot;interactionReceived&quot;</span><span class="hl-1">, (</span><span class="hl-5">event</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">interaction</span><span class="hl-1"> = </span><span class="hl-5">event</span><span class="hl-1">.</span><span class="hl-5">payload</span><span class="hl-1">.</span><span class="hl-5">interaction</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&quot;New interaction from:&quot;</span><span class="hl-1">, </span><span class="hl-5">interaction</span><span class="hl-1">.</span><span class="hl-5">customer</span><span class="hl-1">.</span><span class="hl-5">name</span><span class="hl-1">);</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-7">// Accept an incoming interaction</span><br/><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">interaction</span><span class="hl-1">.</span><span class="hl-0">accept</span><span class="hl-1">();</span><br/><br/><span class="hl-7">// Set notes during the interaction</span><br/><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">interaction</span><span class="hl-1">.</span><span class="hl-0">setNotes</span><span class="hl-1">(</span><span class="hl-2">&quot;Customer inquiry about account&quot;</span><span class="hl-1">);</span><br/><br/><span class="hl-7">// Disconnect the call (for voice interactions)</span><br/><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">interaction</span><span class="hl-1">.</span><span class="hl-0">disconnectCall</span><span class="hl-1">();</span><br/><br/><span class="hl-7">// Close the interaction with resolution status</span><br/><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">interaction</span><span class="hl-1">.</span><span class="hl-0">close</span><span class="hl-1">(</span><span class="hl-5">ResolutionStatus</span><span class="hl-1">.</span><span class="hl-6">RESOLVED</span><span class="hl-1">);</span><br/><br/><span class="hl-7">// Complete the interaction</span><br/><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">interaction</span><span class="hl-1">.</span><span class="hl-0">complete</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="events" class="tsd-anchor-link">Events<a href="#events" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>The SDK provides events for monitoring state changes:</p>
+<h4 id="user-events" class="tsd-anchor-link">User Events<a href="#user-events" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>userStatusChanged</code></td>
+<td>Fired when the agent's status changes</td>
+</tr>
+<tr>
+<td><code>queueStatusChanged</code></td>
+<td>Fired when queue login status changes</td>
+</tr>
+<tr>
+<td><code>interactionReceived</code></td>
+<td>Fired when a new interaction is received</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="typescript"><span class="hl-5">user</span><span class="hl-1">.</span><span class="hl-0">subscribe</span><span class="hl-1">(</span><span class="hl-2">&quot;userStatusChanged&quot;</span><span class="hl-1">, (</span><span class="hl-5">event</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&quot;Status changed to:&quot;</span><span class="hl-1">, </span><span class="hl-5">event</span><span class="hl-1">.</span><span class="hl-5">payload</span><span class="hl-1">.</span><span class="hl-5">status</span><span class="hl-1">);</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<h4 id="interaction-events" class="tsd-anchor-link">Interaction Events<a href="#interaction-events" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>interactionAccepted</code></td>
+<td>Fired when an interaction is accepted</td>
+</tr>
+<tr>
+<td><code>interactionRejected</code></td>
+<td>Fired when an interaction is rejected</td>
+</tr>
+<tr>
+<td><code>interactionCallDisconnected</code></td>
+<td>Fired when the call is disconnected</td>
+</tr>
+<tr>
+<td><code>interactionWrapUp</code></td>
+<td>Fired when entering wrap-up phase</td>
+</tr>
+<tr>
+<td><code>interactionCompleted</code></td>
+<td>Fired when the interaction is completed</td>
+</tr>
+<tr>
+<td><code>interactionNotesUpdated</code></td>
+<td>Fired when notes are updated</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="typescript"><span class="hl-5">interaction</span><span class="hl-1">.</span><span class="hl-0">subscribe</span><span class="hl-1">(</span><span class="hl-2">&quot;interactionWrapUp&quot;</span><span class="hl-1">, (</span><span class="hl-5">event</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&quot;Interaction entered wrap-up phase&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="shutting-down" class="tsd-anchor-link">Shutting Down<a href="#shutting-down" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>To properly clean up and logout:</p>
+<pre><code class="typescript"><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">destroy</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="test-harness" class="tsd-anchor-link">Test Harness<a href="#test-harness" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The SDK includes a standalone test harness — a zero-build-step HTML page for testing the SDK in isolation, without the demo-app. Use it to quickly reproduce customer issues and determine whether a bug is in the SDK or the demo-app.</p>
+<pre><code class="bash"><span class="hl-7"># Build the SDK first</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-3">-F</span><span class="hl-1"> </span><span class="hl-2">./sdk</span><span class="hl-1"> </span><span class="hl-2">build</span><br/><br/><span class="hl-7"># Launch the harness (opens browser automatically)</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-3">-F</span><span class="hl-1"> </span><span class="hl-2">./sdk</span><span class="hl-1"> </span><span class="hl-2">run-harness</span>
+</code><button type="button">Copy</button></pre>
+
+<p>The harness provides:</p>
+<ul>
+<li>Config panel for connection settings (persisted to localStorage)</li>
+<li>Buttons for all agent operations (status, queues, interactions, transfers, conferences)</li>
+<li>Live event log with timestamps, filtering, and JSON export</li>
+<li>Console globals (<code>window.SDK</code>, <code>window.user</code>, <code>window.intr</code>, <code>window.interactions</code>) for debugging</li>
+<li>Multiple simultaneous interaction support</li>
+</ul>
+<p>To verify the harness covers all public API methods and events:</p>
+<pre><code class="bash"><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-3">-F</span><span class="hl-1"> </span><span class="hl-2">./sdk</span><span class="hl-1"> </span><span class="hl-2">check-harness</span>
+</code><button type="button">Copy</button></pre>
+
+<p>See <a href="media/README-1.md"><code>test-harness/README.md</code></a> for full documentation.</p>
+<h2 id="logging" class="tsd-anchor-link">Logging<a href="#logging" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The SDK supports configurable log levels. Pass the <code>logLevel</code> parameter during initialization:</p>
+<pre><code class="typescript"><span class="hl-4">import</span><span class="hl-1"> { </span><span class="hl-5">AvayaInfinityAgentSdk</span><span class="hl-1">, </span><span class="hl-5">LogLevel</span><span class="hl-1"> } </span><span class="hl-4">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@avaya/infinity-agent-sdk&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-6">user</span><span class="hl-1"> = </span><span class="hl-4">await</span><span class="hl-1"> </span><span class="hl-5">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">init</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-5">avayaInfinityHost:</span><span class="hl-1"> </span><span class="hl-2">&quot;api.avayacloud.com&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">clientId:</span><span class="hl-1"> </span><span class="hl-2">&quot;your-client-id&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">oAuthRedirectUri:</span><span class="hl-1"> </span><span class="hl-5">window</span><span class="hl-1">.</span><span class="hl-5">location</span><span class="hl-1">.</span><span class="hl-5">origin</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">logLevel:</span><span class="hl-1"> </span><span class="hl-5">LogLevel</span><span class="hl-1">.</span><span class="hl-6">DEBUG</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Available log levels: <code>ERROR</code>, <code>WARN</code>, <code>INFO</code>, <code>DEBUG</code>, <code>OFF</code></p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#agent-sdk"><span>Agent <wbr/>SDK</span></a><ul><li><a href="#overview"><span>Overview</span></a></li><li><a href="#installation"><span>Installation</span></a></li><li><a href="#usage"><span>Usage</span></a></li><li><ul><li><a href="#initialization"><span>Initialization</span></a></li><li><ul><li><a href="#redirect-mode-default"><span>Redirect mode (default)</span></a></li><li><a href="#popup-mode"><span>Popup mode</span></a></li></ul></li><li><a href="#oauth-callback-page"><span>O<wbr/>Auth <wbr/>Callback <wbr/>Page</span></a></li><li><ul><li><a href="#using-the-sdk-provided-callback-page"><span>Using the <wbr/>SDK-<wbr/>provided callback page</span></a></li><li><a href="#using-a-custom-callback-page"><span>Using a custom callback page</span></a></li></ul></li><li><a href="#managing-agent-status"><span>Managing <wbr/>Agent <wbr/>Status</span></a></li><li><a href="#working-with-queues"><span>Working with <wbr/>Queues</span></a></li><li><a href="#handling-interactions"><span>Handling <wbr/>Interactions</span></a></li><li><a href="#events"><span>Events</span></a></li><li><ul><li><a href="#user-events"><span>User <wbr/>Events</span></a></li><li><a href="#interaction-events"><span>Interaction <wbr/>Events</span></a></li></ul></li><li><a href="#shutting-down"><span>Shutting <wbr/>Down</span></a></li></ul></li><li><a href="#test-harness"><span>Test <wbr/>Harness</span></a></li><li><a href="#logging"><span>Logging</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">@avaya/infinity-agent-sdk - v0.0.0-test1</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer></footer><div class="overlay"></div></body></html>
