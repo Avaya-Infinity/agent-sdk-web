@@ -9,13 +9,13 @@ The Avaya Infinity™ platform provides the Agent SDK, which is a library that p
 
 ## Quick Start
 
-To get started with the Agent SDK and quickly tryout the functionalities provided by it, Run the Demo Application. Refer the instructions in the [README](TODO_PLACEHOLDER_LINK_DEMO_APP_README)
+To get started with the Agent SDK and quickly tryout the functionalities provided by it, Run the Demo Application. Refer the instructions in the [README](https://github.com/Avaya-Infinity/agent-sdk-web/tree/main/demo-app/README.md)
 
 ## Next Steps
 1. Review the key components and integration flow involved to achieve Agent SDK integration in the [Overview](#overview) section.
 2. Obtain the [necessary access information for Agent SDK](#details-required-for-agent-sdk-client) from the Avaya Infinity™ Admin Console.
 3. Refer to these supporting artifacts:
-	- [Agent SDK API documentation](TODO_PLACEHOLDER_AGENT_SDK_API_DOCS_LINK)
+	- [Agent SDK API documentation](https://avaya-infinity.github.io/agent-sdk-web/)
 	- [Demo Client Application](./demo-app)
 4. Integrate your client application with Agent SDK to enable contact center agent capabilities.
 

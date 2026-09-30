@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This sample application demonstrates how to integrate with the [Avaya Infinity™ Agent SDK](TODO_PLACEHOLDER_AGENT_SDK_API_DOCS_LINK) and build a contact center agent desktop. It showcases core agent workflows including OAuth authentication, voice call handling, queue management, and real-time interaction management.
+This sample application demonstrates how to integrate with the [Avaya Infinity™ Agent SDK](https://avaya-infinity.github.io/agent-sdk-web/) and build a contact center agent desktop. It showcases core agent workflows including OAuth authentication, voice call handling, queue management, and real-time interaction management.
 
 > ⚠️ WARNING
 > 
@@ -76,5 +76,5 @@ The application supports two OAuth modes. Your Account Administrator must regist
 ## Next Steps
 
 1. Explore the `demo-app` source code to understand how the SDK is initialized and used.
-2. Refer to the [Avaya Infinity Agent SDK](TODO_PLACEHOLDER_LINK_AGENT_SDK_NPM) package on npm and the [API documentation](TODO_PLACEHOLDER_AGENT_SDK_API_DOCS_LINK) for detailed reference.
+2. Refer to the [Avaya Infinity Agent SDK](https://www.npmjs.com/package/@avaya/infinity-agent-sdk) package on npm and the [API documentation](https://avaya-infinity.github.io/agent-sdk-web/) for detailed reference.
 3. Use this demo application as a starting point to build your own agent desktop tailored to your business requirements.
