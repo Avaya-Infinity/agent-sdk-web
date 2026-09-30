@@ -1,0 +1,112 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>Integration and Lifecycle | @avaya/infinity-agent-sdk - v1.0.0</title><meta name="description" content="Documentation for @avaya/infinity-agent-sdk"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="../index.html" class="title">@avaya/infinity-agent-sdk - v1.0.0</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb" aria-label="Breadcrumb"><li><a href="Use_Cases.html">Use Cases</a></li><li><a href="" aria-current="page">Integration and Lifecycle</a></li></ul></div><div class="tsd-panel tsd-typography"><h1 id="integration-and-lifecycle" class="tsd-anchor-link">Integration and Lifecycle<a href="#integration-and-lifecycle" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<p>This guide covers the full lifecycle of the Agent SDK - OAuth sign-in (with optional SSO), initialization, lifecycle events, and a clean teardown.</p>
+<p><strong>Personas:</strong> Developer / Integrator - the host application initializes, restores, and tears down the session the same way for every signed-in user.</p>
+<h2 id="overview" class="tsd-anchor-link">Overview<a href="#overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The SDK authenticates agents via OAuth through the Avaya Infinity™ login, which can be federated to a corporate IdP for SSO. You choose the <a href="#oauth-modes">OAuth flow mode</a> during initialization:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>redirect</code> <em>(default)</em></td>
+<td>Navigates the page to the IdP login</td>
+<td>Standalone SPAs</td>
+</tr>
+<tr>
+<td><code>popup</code></td>
+<td>Opens the IdP login in a popup window</td>
+<td>Embedded environments (Salesforce iframes etc.)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="prerequisites" class="tsd-anchor-link">Prerequisites<a href="#prerequisites" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Collect these from your Avaya Infinity™ account administrator:</p>
+<ul>
+<li><code>avayaInfinityHost</code> - e.g. <code>api.avayacloud.com</code>.</li>
+<li><code>clientId</code> - generated when an Agent SDK integration is provisioned.</li>
+<li><code>oAuthRedirectUri</code> - must match a redirect URI registered on the integration. In popup mode this URI also hosts the <a href="#oauth-callback-page">callback page</a>.</li>
+<li><code>idpHint</code> <em>(optional)</em> - identity provider alias for one-click SSO.</li>
+</ul>
+<p>These are provided through <a href="../interfaces/avaya-infinity-agent-sdk.AvayaInfinityAgentSdkInitParams.html" class="tsd-kind-interface"> AvayaInfinityAgentSdkInitParams</a> as an argument to <a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdk.html#init" class="tsd-kind-method"> AvayaInfinityAgentSdk.init</a>.</p>
+<h2 id="initializing-the-sdk" class="tsd-anchor-link">Initializing the SDK<a href="#initializing-the-sdk" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p><a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdk.html#init" class="tsd-kind-method"> AvayaInfinityAgentSdk.init</a> is the single entry point. It performs the Agent Authentication and returns a promise which resolves to a <a href="../classes/avaya-infinity-agent-sdk.User.html" class="tsd-kind-class"> User</a> representing the authenticated agent.</p>
+<pre><code class="ts"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@avaya/infinity-agent-sdk&quot;</span><span class="hl-1">;</span><br/><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">user</span><span class="hl-1"> = </span><span class="hl-3">await</span><span class="hl-1"> </span><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">init</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-4">avayaInfinityHost:</span><span class="hl-1"> </span><span class="hl-2">&quot;api.avayacloud.com&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">clientId:</span><span class="hl-1"> </span><span class="hl-2">&quot;your-client-id&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">oAuthRedirectUri:</span><span class="hl-1"> </span><span class="hl-4">window</span><span class="hl-1">.</span><span class="hl-4">location</span><span class="hl-1">.</span><span class="hl-4">origin</span><span class="hl-1">,</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="oauth-modes" class="tsd-anchor-link">OAuth Modes<a href="#oauth-modes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p><strong>Redirect mode</strong> (default): <code>init()</code> navigates the page to the IdP. After login, the IdP redirects back with an authorization code and your app must call <code>init()</code> again to resume the initialization. The first call returns a never-resolving promise - make sure your app calls <code>init()</code> on every page load.</p>
+<p><strong>Popup mode</strong>: <code>init()</code> opens the IdP in a popup; the current page stays put and the promise resolves once authentication completes. Create a <a href="#oauth-callback-page">callback page</a> and provide it's link as <code>oAuthRedirectUri</code>.</p>
+<pre><code class="ts"><span class="hl-4">loginButton</span><span class="hl-1">.</span><span class="hl-0">addEventListener</span><span class="hl-1">(</span><span class="hl-2">&quot;click&quot;</span><span class="hl-1">, </span><span class="hl-6">async</span><span class="hl-1"> () </span><span class="hl-6">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">user</span><span class="hl-1"> = </span><span class="hl-3">await</span><span class="hl-1"> </span><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">init</span><span class="hl-1">({</span><br/><span class="hl-1">    </span><span class="hl-4">avayaInfinityHost:</span><span class="hl-1"> </span><span class="hl-2">&quot;api.avayacloud.com&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">clientId:</span><span class="hl-1"> </span><span class="hl-2">&quot;your-client-id&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">oAuthRedirectUri:</span><span class="hl-1"> </span><span class="hl-2">&quot;https://your-app.com/callback&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">oAuthMode:</span><span class="hl-1"> </span><span class="hl-2">&quot;popup&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  });</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="oauth-callback-page" class="tsd-anchor-link">OAuth Callback Page<a href="#oauth-callback-page" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Popup mode needs a page at <code>oAuthRedirectUri</code> that forwards the authorization code back to the opener window. Call <a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdk.html#handleoauthcallback" class="tsd-kind-method"> AvayaInfinityAgentSdk.handleOAuthCallback</a> from that page; the helper extracts the <code>code</code>, posts it back, and closes the popup:</p>
+<pre><code class="ts"><span class="hl-5">// callback.ts (hosted at oAuthRedirectUri)</span><br/><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&quot;@avaya/infinity-agent-sdk&quot;</span><span class="hl-1">;</span><br/><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">handleOAuthCallback</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="sso-with-idp-hint" class="tsd-anchor-link">SSO with IdP Hint<a href="#sso-with-idp-hint" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>If your tenant is federated to a corporate IdP, pass <code>idpHint</code> to skip the IdP-selection screen and route the agent straight to their provider:</p>
+<pre><code class="ts"><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">user</span><span class="hl-1"> = </span><span class="hl-3">await</span><span class="hl-1"> </span><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">init</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-4">avayaInfinityHost:</span><span class="hl-1"> </span><span class="hl-2">&quot;api.avayacloud.com&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">clientId:</span><span class="hl-1"> </span><span class="hl-2">&quot;your-client-id&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">oAuthRedirectUri:</span><span class="hl-1"> </span><span class="hl-4">window</span><span class="hl-1">.</span><span class="hl-4">location</span><span class="hl-1">.</span><span class="hl-4">origin</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">idpHint:</span><span class="hl-1"> </span><span class="hl-2">&quot;entra-id&quot;</span><span class="hl-1">,   </span><span class="hl-5">// IdP alias</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="lifecycle-events" class="tsd-anchor-link">Lifecycle Events<a href="#lifecycle-events" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Subscribe via <a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdk.html#subscribe" class="tsd-kind-method"> AvayaInfinityAgentSdk.subscribe</a>:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>When it fires</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#sdk_initialized" class="tsd-kind-enum-member"> SdkEventType.SDK_INITIALIZED</a></td>
+<td><code>init()</code> completed</td>
+</tr>
+<tr>
+<td><a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#initialization_failed" class="tsd-kind-enum-member"> SdkEventType.INITIALIZATION_FAILED</a></td>
+<td><code>init()</code> failed</td>
+</tr>
+<tr>
+<td><a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#token_refresh_failed" class="tsd-kind-enum-member"> SdkEventType.TOKEN_REFRESH_FAILED</a></td>
+<td>OAuth token refresh failed; the SDK self-destructs</td>
+</tr>
+<tr>
+<td><a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#session_destroyed" class="tsd-kind-enum-member"> SdkEventType.SESSION_DESTROYED</a></td>
+<td>Server invalidated the session; the SDK self-destructs</td>
+</tr>
+<tr>
+<td><a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#sdk_destroyed" class="tsd-kind-enum-member"> SdkEventType.SDK_DESTROYED</a></td>
+<td><code>destroy()</code> completed</td>
+</tr>
+</tbody>
+</table>
+<p>Both <a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#token_refresh_failed" class="tsd-kind-enum-member"> SdkEventType.TOKEN_REFRESH_FAILED</a> and <a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#session_destroyed" class="tsd-kind-enum-member"> SdkEventType.SESSION_DESTROYED</a> signal that the session ended without your app calling <a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdk.html#destroy" class="tsd-kind-method"> AvayaInfinityAgentSdk.destroy</a> - the SDK tears itself down in response. Subscribe to both and route the agent back to a signed-out / re-login state:</p>
+<pre><code class="ts"><span class="hl-5">// Session ended unexpectedly - OAuth token refresh was exhausted.</span><br/><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">subscribe</span><span class="hl-1">(</span><span class="hl-4">SdkEventType</span><span class="hl-1">.</span><span class="hl-7">TOKEN_REFRESH_FAILED</span><span class="hl-1">, () </span><span class="hl-6">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">showReloginModal</span><span class="hl-1">();</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-5">// Session was invalidated server-side (e.g. revoked or forced logout).</span><br/><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">subscribe</span><span class="hl-1">(</span><span class="hl-4">SdkEventType</span><span class="hl-1">.</span><span class="hl-7">SESSION_DESTROYED</span><span class="hl-1">, () </span><span class="hl-6">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">showReloginModal</span><span class="hl-1">();</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="destroying-the-session" class="tsd-anchor-link">Destroying the Session<a href="#destroying-the-session" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>When the SDK is no longer needed or the agent wants to log out, call <a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdk.html#destroy" class="tsd-kind-method"> AvayaInfinityAgentSdk.destroy</a>. Calling <code>destroy()</code> will teardown the SDK:</p>
+<pre><code class="ts"><span class="hl-3">await</span><span class="hl-1"> </span><span class="hl-4">AvayaInfinityAgentSdk</span><span class="hl-1">.</span><span class="hl-0">destroy</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="error-handling" class="tsd-anchor-link">Error Handling<a href="#error-handling" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>All failures surface as typed <a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdkError.html" class="tsd-kind-class"> AvayaInfinityAgentSdkError</a>s. Errors on the SDK lifecycle path belong to the <code>ASE_1xxx</code> family - match <code>error.code</code> against <a href="../enums/avaya-infinity-agent-sdk.AvayaInfinityAgentSdkErrorCodes.html" class="tsd-kind-enum"> AvayaInfinityAgentSdkErrorCodes</a> to identify the specific failure. If no specific code applies, the SDK falls back to <code>ASE_1000</code>.</p>
+<p>If token-refresh fails mid-session (after retries are exhausted), the SDK surfaces <a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#token_refresh_failed" class="tsd-kind-enum-member"> SdkEventType.TOKEN_REFRESH_FAILED</a> and begins teardown automatically. Once complete, <a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html#sdk_destroyed" class="tsd-kind-enum-member"> SdkEventType.SDK_DESTROYED</a> is raised.</p>
+<h2 id="related-api" class="tsd-anchor-link">Related API<a href="#related-api" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><strong><a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdk.html" class="tsd-kind-class"> AvayaInfinityAgentSdk</a></strong></li>
+<li><strong><a href="../interfaces/avaya-infinity-agent-sdk.AvayaInfinityAgentSdkInitParams.html" class="tsd-kind-interface"> AvayaInfinityAgentSdkInitParams</a></strong></li>
+<li><strong><a href="../enums/avaya-infinity-agent-sdk.OAuthMode.html" class="tsd-kind-enum"> OAuthMode</a></strong></li>
+<li><strong><a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdk.html#handleoauthcallback" class="tsd-kind-method"> AvayaInfinityAgentSdk.handleOAuthCallback</a></strong></li>
+<li><strong><a href="../classes/avaya-infinity-agent-sdk.User.html" class="tsd-kind-class"> User</a></strong></li>
+<li><strong><a href="../enums/avaya-infinity-agent-sdk.SdkEventType.html" class="tsd-kind-enum"> SdkEventType</a></strong></li>
+<li><strong><a href="../classes/avaya-infinity-agent-sdk.AvayaInfinityAgentSdkError.html" class="tsd-kind-class"> AvayaInfinityAgentSdkError</a></strong></li>
+<li><strong><a href="../enums/avaya-infinity-agent-sdk.AvayaInfinityAgentSdkErrorCodes.html" class="tsd-kind-enum"> AvayaInfinityAgentSdkErrorCodes</a></strong></li>
+</ul>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#integration-and-lifecycle"><span>Integration and <wbr/>Lifecycle</span></a><ul><li><a href="#overview"><span>Overview</span></a></li><li><a href="#prerequisites"><span>Prerequisites</span></a></li><li><a href="#initializing-the-sdk"><span>Initializing the <wbr/>SDK</span></a></li><li><a href="#oauth-modes"><span>O<wbr/>Auth <wbr/>Modes</span></a></li><li><a href="#oauth-callback-page"><span>O<wbr/>Auth <wbr/>Callback <wbr/>Page</span></a></li><li><a href="#sso-with-idp-hint"><span>SSO with <wbr/>Id<wbr/>P <wbr/>Hint</span></a></li><li><a href="#lifecycle-events"><span>Lifecycle <wbr/>Events</span></a></li><li><a href="#destroying-the-session"><span>Destroying the <wbr/>Session</span></a></li><li><a href="#error-handling"><span>Error <wbr/>Handling</span></a></li><li><a href="#related-api"><span>Related <wbr/>API</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../modules.html">@avaya/infinity-agent-sdk - v1.0.0</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer></footer><div class="overlay"></div></body></html>

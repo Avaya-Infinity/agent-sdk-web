@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authentication</title>
+</head>
+<body>
+    <p>Authenticating... this window will close automatically.</p>
+    <script>
+        /**
+         * OAuth callback handler for popup-based authentication.
+         *
+         * This page is loaded inside the OAuth popup window after the Identity Provider
+         * redirects back with the authorization code. It extracts the code (or error) from
+         * the URL and sends it to the opener window (where the SDK is running) via postMessage,
+         * then closes itself.
+         */
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var code = params.get("code");
+            var error = params.get("error");
+
+            if (window.opener) {
+                window.opener.postMessage(
+                    { type: "avaya-oauth-callback", code: code, error: error },
+                    window.location.origin
+                );
+                window.close();
+            }
+        })();
+    </script>
+</body>
+</html>
